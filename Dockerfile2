@@ -1,0 +1,38 @@
+# Stage 1: Build Stage
+FROM python:3.10-slim as build
+
+# Update package lists and install build essentials
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends build-essential gcc 
+
+# Set working directory for the build stage
+WORKDIR /usr/app
+
+# Create a Python virtual environment
+RUN python -m venv /usr/app/venv
+
+# Add the virtual environment to the PATH
+ENV PATH="/usr/app/venv/bin:$PATH"
+
+# Copy requirements.txt and install dependencies
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# Stage 2: Runtime Stage
+FROM python:3.10-slim
+
+# Set working directory for the runtime stage
+WORKDIR /usr/app_test
+
+# Copy the virtual environment from the build stage
+COPY --from=build /usr/app/venv /usr/app_test/venv
+
+# Copy the application code
+COPY . .
+
+# Add the virtual environment to the PATH for runtime
+ENV PATH="/usr/app_test/venv/bin:$PATH"
+
+# Execute the tests using pytest
+ENTRYPOINT ["python","-m", "pytest"]
+CMD ["."]
