@@ -1,0 +1,13 @@
+# Project specific
+.dockerignore
+Dockerfile
+.git
+.gitignore
+
+# Python
+
+**/*.py[cod]
+**/__pycache__
+
+**/.cache
+**/.pytest_cache
